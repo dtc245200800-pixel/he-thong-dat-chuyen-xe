@@ -1,0 +1,80 @@
+name: ride-dispatch
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Ride_dev_2026!}"
+    ports: ["1433:1433"]
+    volumes: ["sql-data:/var/opt/mssql"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$${MSSQL_SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 25s
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ride
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-ride_dev_2026}"
+    ports: ["5672:5672", "15672:15672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  notifications:
+    build:
+      context: .
+      dockerfile: src/Ride.Notifications/Dockerfile
+    ports: ["8081:8080"]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Ride.Api/Dockerfile
+    environment:
+      ConnectionStrings__Rides: "Server=sql,1433;Database=RideDispatch;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Ride_dev_2026!};TrustServerCertificate=True;Encrypt=False"
+      RabbitMq__Uri: "amqp://ride:${RABBITMQ_PASSWORD:-ride_dev_2026}@rabbitmq:5672"
+      Services__Notifications: "http://notifications:8080"
+    ports: ["8080:8080"]
+    depends_on:
+      sql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      notifications: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  matching-worker:
+    build:
+      context: .
+      dockerfile: src/Ride.MatchingWorker/Dockerfile
+    environment:
+      RabbitMq__Uri: "amqp://ride:${RABBITMQ_PASSWORD:-ride_dev_2026}@rabbitmq:5672"
+      Services__TripApi: "http://api:8080"
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      api: { condition: service_healthy }
+
+  web:
+    build:
+      context: .
+      dockerfile: src/Ride.Web/Dockerfile
+    ports: ["3000:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+      notifications: { condition: service_healthy }
+
+volumes:
+  sql-data:

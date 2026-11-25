@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa"><title>Đi Chung — Đặt chuyến xe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#"><span class="brand-mark">đ</span><span>đi<span class="brand-light">chung</span></span></a><div class="topbar-right"><span class="live-dot"></span><span>Hệ thống đang hoạt động</span><div class="avatar">KH</div></div></header>
+  <main class="layout">
+    <section class="welcome"><div><p class="eyebrow">THỨ BA, 25 THÁNG 11</p><h1>Chào bạn, hôm nay<br>mình đi đâu? <span>✳</span></h1><p class="welcome-copy">Đặt chuyến xe nhanh chóng. Tài xế phù hợp sẽ được tìm cho bạn.</p></div><div class="welcome-art" aria-hidden="true"><span class="sun"></span><span class="hill hill-a"></span><span class="hill hill-b"></span><span class="road"></span><span class="car">●</span></div></section>
+    <section class="content-grid">
+      <div class="left-column">
+        <article class="card booking-card">
+          <div class="card-heading"><div><span class="section-kicker">ĐẶT XE MỚI</span><h2>Bạn muốn đến đâu?</h2></div><span class="round-icon">↗</span></div>
+          <form id="booking-form">
+            <label class="field-label" for="passenger">Mã hành khách</label><input id="passenger" name="passengerId" value="khach-001" required>
+            <div class="location-fields"><div class="route-rail"><i></i><b></b><i></i></div><div class="locations">
+              <label class="location-box"><span>ĐIỂM ĐÓN</span><input name="pickup" value="Nhà thờ Đức Bà" required></label>
+              <label class="location-box destination"><span>ĐIỂM ĐẾN</span><input name="destination" placeholder="Nhập điểm đến" required></label>
+            </div></div>
+            <details class="coordinates"><summary>Tùy chỉnh tọa độ cho điểm đón và điểm đến</summary><div class="coordinate-grid">
+              <label>Vĩ độ đón<input name="pickupLatitude" type="number" step="any" value="10.7798" required></label><label>Kinh độ đón<input name="pickupLongitude" type="number" step="any" value="106.6990" required></label>
+              <label>Vĩ độ đến<input name="destinationLatitude" type="number" step="any" value="10.7769" required></label><label>Kinh độ đến<input name="destinationLongitude" type="number" step="any" value="106.7009" required></label>
+            </div></details>
+            <button class="primary-button" id="submit-button" type="submit"><span>Đặt chuyến xe</span><span>→</span></button>
+          </form>
+          <div id="form-message" class="form-message" role="status"></div>
+        </article>
+        <article class="card drivers-card"><div class="card-heading compact"><div><span class="section-kicker">ĐỘI NGŨ TÀI XẾ</span><h2>Tài xế gần bạn</h2></div><span id="driver-count" class="count-pill">—</span></div><div id="drivers-list" class="drivers-list"><div class="skeleton"></div><div class="skeleton short"></div></div></article>
+      </div>
+      <div class="right-column">
+        <article class="card status-card"><div class="card-heading compact"><div><span class="section-kicker">THEO DÕI</span><h2>Chuyến xe của bạn</h2></div><button class="icon-button" id="refresh-button" aria-label="Tải lại">↻</button></div><div class="connection"><span id="connection-dot" class="live-dot muted"></span><span id="connection-label">Đang kết nối cập nhật trực tiếp…</span></div><div id="trip-list" class="trip-list"><div class="empty-state"><div class="empty-icon">↗</div><strong>Chưa có chuyến xe</strong><span>Chuyến bạn đặt sẽ xuất hiện ở đây.</span></div></div></article>
+        <article class="note-card"><span class="note-icon">✳</span><div><strong>Đi gần, vui hơn</strong><p>Hệ thống tự tìm tài xế đang rảnh và ở gần điểm đón của bạn.</p></div></article>
+      </div>
+    </section>
+    <footer><span>© 2026 Đi Chung</span><span>Đặt xe dễ dàng, an tâm trên mọi hành trình.</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script><script src="/app.js"></script>
+</body>
+</html>

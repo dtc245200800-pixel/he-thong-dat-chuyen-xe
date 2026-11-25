@@ -12,7 +12,7 @@ public sealed class Worker(IConfiguration config, IHttpClientFactory clients, IL
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var factory = new ConnectionFactory { Uri = new Uri(config["RabbitMq:Uri"]!), ClientProvidedName = "ride-matching-worker" };
+        var factory = new ConnectionFactory { Uri = new Uri(config["RabbitMq:Uri"]!), ClientProvidedName = "ride-matching-worker", AutomaticRecoveryEnabled = false };
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -34,12 +34,15 @@ public sealed class Worker(IConfiguration config, IHttpClientFactory clients, IL
                     catch (Exception ex)
                     {
                         log.LogError(ex, "Matching failed; request will be retried");
+                        await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken);
                         await channel.BasicNackAsync(ea.DeliveryTag, false, true, stoppingToken);
                     }
                 };
                 await channel.BasicConsumeAsync("trip-requests", autoAck: false, consumer, stoppingToken);
                 log.LogInformation("Listening for trip requests");
-                await Task.Delay(Timeout.Infinite, stoppingToken);
+                while (!stoppingToken.IsCancellationRequested && connection.IsOpen && channel.IsOpen)
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                if (!stoppingToken.IsCancellationRequested) throw new IOException("RabbitMQ connection closed; reconnecting.");
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception ex) { log.LogError(ex, "Queue connection failed; reconnecting in 5 seconds"); await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); }

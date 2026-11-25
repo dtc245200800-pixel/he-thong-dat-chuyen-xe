@@ -10,5 +10,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
   </ItemGroup>
-  <ItemGroup><ProjectReference Include="..\Ride.Contracts\Ride.Contracts.csproj"/><PackageReference Include="RabbitMQ.Client" Version="7.1.2"/></ItemGroup>
+  <ItemGroup><ProjectReference Include="..\Ride.Contracts\Ride.Contracts.csproj"/><PackageReference Include="RabbitMQ.Client" Version="7.2.0"/></ItemGroup>
 </Project>
