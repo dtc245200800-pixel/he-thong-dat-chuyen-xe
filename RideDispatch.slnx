@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ride.Api/Ride.Api.csproj" />
+    <Project Path="src/Ride.Contracts/Ride.Contracts.csproj" />
+    <Project Path="src/Ride.MatchingWorker/Ride.MatchingWorker.csproj" />
+    <Project Path="src/Ride.Notifications/Ride.Notifications.csproj" />
+    <Project Path="src/Ride.Web/Ride.Web.csproj" />
+  </Folder>
+</Solution>
